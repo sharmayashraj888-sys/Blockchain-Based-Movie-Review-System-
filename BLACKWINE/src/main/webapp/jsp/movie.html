@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLACKWINE | Film</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+<script>
+var web3,contract;
+var contractAddress="0x5d33077d7C1baB18647704526E5234b60aA19C10";
+var abi=[{"inputs":[{"internalType":"string","name":"_movieName","type":"string"},{"internalType":"string","name":"_reviewText","type":"string"},{"internalType":"uint256","name":"_rating","type":"uint256"}],"name":"addReview","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getReviews","outputs":[{"components":[{"internalType":"string","name":"movieName","type":"string"},{"internalType":"string","name":"reviewText","type":"string"},{"internalType":"uint256","name":"rating","type":"uint256"},{"internalType":"address","name":"reviewer","type":"address"}],"internalType":"struct MovieReview.Review[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"}];
+async function initBlockchain(){if(!window.ethereum){showToast("MetaMask not detected","warn");return false;}try{web3=new Web3(window.ethereum);await window.ethereum.request({method:"eth_requestAccounts"});contract=new web3.eth.Contract(abi,contractAddress);return true;}catch(e){showToast("Wallet error: "+e.message,"warn");return false;}}
+async function addReviewToBlockchain(movie,review,rating){if(!contract){showToast("Connect MetaMask first","warn");return;}try{const acc=await web3.eth.getAccounts();await contract.methods.addReview(movie,review,rating).send({from:acc[0]});}catch(e){if(e.code===4001)showToast("Transaction rejected","warn");else showToast("Blockchain error: "+e.message,"error");}}
+function showToast(msg,type="info"){let t=document.getElementById("bw-toast");if(!t){t=document.createElement("div");t.id="bw-toast";document.body.appendChild(t);}const c={info:"background:#1a1a1a;color:#fff;border:1px solid rgba(255,255,255,0.15)",warn:"background:#1a1200;color:#ffcc00;border:1px solid rgba(255,204,0,0.3)",error:"background:#1a0008;color:#ff4466;border:1px solid rgba(255,68,102,0.3)",ok:"background:#001a0a;color:#00ff88;border:1px solid rgba(0,255,136,0.3)"};t.style.cssText=`position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:9999;padding:14px 28px;border-radius:30px;font-size:14px;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:1px;max-width:400px;transition:opacity 0.4s ease;${c[type]||c.info}`;t.innerText=msg;t.style.opacity="1";clearTimeout(t._t);t._t=setTimeout(()=>{t.style.opacity="0"},3500);}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{min-height:100vh;background:#0a0a0a;color:#fff;overflow-x:hidden;}
+
+.backdrop{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center top;filter:blur(40px) brightness(0.18) saturate(1.4);transform:scale(1.1);}
+.backdrop-overlay{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.97) 100%);}
+.page{position:relative;z-index:10;animation:fadeIn 0.7s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+header{position:sticky;top:0;z-index:200;display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:18px 60px;background:rgba(0,0,0,0.55);border-bottom:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(20px);}
+.logo{display:flex;align-items:center;gap:12px;cursor:pointer;}
+.logo img{width:40px;filter:drop-shadow(0 0 10px rgba(255,255,255,0.25));animation:glow 4s ease-in-out infinite;}
+@keyframes glow{0%,100%{filter:brightness(1.05) drop-shadow(0 0 6px rgba(255,255,255,0.15));}50%{filter:brightness(1.2) drop-shadow(0 0 16px rgba(255,255,255,0.35));}}
+.logo-text{font-size:28px;font-weight:800;letter-spacing:3px;color:#fff;position:relative;overflow:hidden;}
+.logo-text::after{content:"";position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,0.7),transparent);transform:skewX(-20deg);animation:shine 4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%}50%,100%{left:120%}}
+.header-right{display:flex;align-items:center;gap:14px;}
+.back-btn{display:flex;align-items:center;gap:8px;padding:10px 22px;border-radius:30px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:#fff;font-size:14px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:0.3s ease;}
+.back-btn:hover{background:rgba(255,255,255,0.14);box-shadow:0 0 20px rgba(255,255,255,0.15);transform:scale(1.04);}
+.user-chip{display:flex;align-items:center;gap:9px;padding:7px 16px 7px 7px;border-radius:30px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);font-size:13px;}
+.user-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.2);}
+
+.hero-area{display:grid;grid-template-columns:300px 1fr;gap:60px;padding:60px 60px 0;align-items:start;}
+
+/* poster-col is the outer positioning context for wl-badge */
+.poster-col{position:relative;width:300px;}
+
+/* poster-border is a non-clipping wrapper that shows the gold border */
+.poster-border{
+    position:relative;
+    width:300px;
+    border-radius:20px;
+    border:2px solid transparent;
+    background:linear-gradient(#0a0a0a,#0a0a0a) padding-box,
+               linear-gradient(135deg,rgba(212,175,55,0.45),transparent 50%,rgba(212,175,55,0.2)) border-box;
+    box-shadow:0 0 0 1px rgba(255,255,255,0.06),0 30px 80px rgba(0,0,0,0.9),0 0 60px rgba(212,175,55,0.08);
+    transition:transform 0.4s ease,box-shadow 0.4s ease;
+}
+.poster-border:hover{
+    transform:translateY(-8px) scale(1.02);
+    box-shadow:0 0 0 1px rgba(255,255,255,0.1),0 40px 100px rgba(0,0,0,0.95),0 0 80px rgba(212,175,55,0.22);
+}
+
+/* poster-frame clips the image + shimmer only, no gold border interference */
+.poster-frame{position:relative;width:100%;border-radius:18px;overflow:hidden;display:block;}
+.poster-frame img{width:100%;display:block;}
+
+/* shimmer sweep on hover */
+.poster-frame::before{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,0.09) 50%,transparent 70%);transform:translateX(-100%);transition:0.7s ease;pointer-events:none;}
+.poster-border:hover .poster-frame::before{transform:translateX(100%);}
+
+/* wl-badge lives on poster-col (outside overflow:hidden) so it's never clipped */
+.wl-badge{position:absolute;top:16px;right:16px;z-index:20;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:0.3s ease;color:#ccc;}
+.wl-badge:hover{transform:scale(1.15);border-color:rgba(255,255,255,0.4);}
+.wl-badge.saved{background:#fff;color:#333;border-color:#fff;box-shadow:0 0 20px rgba(255,255,255,0.4);}
+
+.poster-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;width:300px;}
+.ptag{padding:5px 14px;border-radius:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);font-size:12px;color:#bbb;letter-spacing:1px;}
+
+.info-col{padding-top:10px;}
+.breadcrumb{font-size:11px;color:#555;letter-spacing:3px;text-transform:uppercase;margin-bottom:18px;}
+.breadcrumb span{color:#d4af37;}
+
+.film-title{font-family:'Oswald',sans-serif;font-size:56px;font-weight:700;letter-spacing:2px;line-height:1.05;margin-bottom:10px;color:#fff;}
+.film-title .gold{color:#d4af37;}
+.tagline{font-size:13px;color:#555;letter-spacing:2px;margin-bottom:24px;text-transform:uppercase;}
+
+.chain-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);font-size:11px;color:#d4af37;letter-spacing:2px;margin-bottom:24px;}
+.chain-dot{width:6px;height:6px;border-radius:50%;background:#d4af37;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+
+.stat-row{display:flex;gap:1px;margin-bottom:28px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);}
+.stat-box{flex:1;padding:18px 16px;text-align:center;background:#0e0e0e;transition:0.3s;position:relative;}
+.stat-box:not(:last-child)::after{content:"";position:absolute;right:0;top:20%;height:60%;width:1px;background:rgba(255,255,255,0.07);}
+.stat-box:hover{background:#141414;}
+.stat-num{font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;color:#d4af37;display:block;line-height:1;}
+.stat-num.white{color:#fff;}
+.stat-lbl{font-size:10px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-top:5px;display:block;}
+
+.rate-section{background:#0e0e0e;border-radius:18px;border:1px solid rgba(255,255,255,0.08);padding:24px;margin-bottom:0;}
+.rate-label{font-size:11px;color:#555;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;}
+.stars-wrap{display:flex;gap:6px;margin-bottom:14px;}
+.star{font-size:30px;cursor:pointer;color:#2a2a2a;transition:color 0.15s ease,transform 0.15s ease;line-height:1;user-select:none;}
+.star:hover,.star.active{color:#d4af37;}
+.star:hover{transform:scale(1.2);}
+.star-score-display{font-size:14px;color:#555;letter-spacing:1px;margin-bottom:16px;}
+.star-score-display span{color:#d4af37;font-size:20px;font-weight:700;font-family:'Oswald',sans-serif;}
+
+.review-textarea{width:100%;padding:14px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#fff;font-size:14px;resize:vertical;outline:none;transition:0.3s;line-height:1.7;min-height:90px;}
+.review-textarea::placeholder{color:#444;}
+.review-textarea:focus{border-color:rgba(212,175,55,0.4);background:rgba(255,255,255,0.06);box-shadow:0 0 0 3px rgba(212,175,55,0.07);}
+.form-footer{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+.char-count{font-size:12px;color:#444;}
+
+.submit-btn{display:flex;align-items:center;gap:9px;padding:12px 28px;border-radius:30px;background:linear-gradient(135deg,#d4af37,#a08020);border:none;color:#000;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer;transition:0.3s ease;position:relative;overflow:hidden;}
+.submit-btn:hover{transform:scale(1.04);box-shadow:0 0 30px rgba(212,175,55,0.4);}
+.submit-btn:active{transform:scale(0.98);}
+.submit-btn.loading{opacity:0.7;pointer-events:none;}
+
+.lower-section{padding:50px 60px 80px;}
+.section-head{display:flex;align-items:center;gap:16px;margin-bottom:28px;}
+.section-head-title{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;letter-spacing:3px;white-space:nowrap;}
+.section-head-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,0.12),transparent);}
+.section-head-count{font-size:12px;color:#555;letter-spacing:2px;}
+
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;}
+.review-card{background:#0e0e0e;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden;transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s;animation:cardIn 0.4s ease both;}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.review-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.6);border-color:rgba(212,175,55,0.2);}
+.review-card::before{content:"";position:absolute;left:0;top:15%;height:70%;width:2px;background:linear-gradient(180deg,transparent,#d4af37,transparent);border-radius:2px;opacity:0;transition:0.3s;}
+.review-card:hover::before{opacity:1;}
+
+.rc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.rc-stars{color:#d4af37;font-size:14px;letter-spacing:2px;}
+.rc-rating{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;color:#d4af37;}
+.rc-rating small{font-size:13px;color:#555;font-weight:400;}
+.rc-text{font-size:14px;color:#999;line-height:1.7;margin-bottom:14px;}
+.rc-footer{display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);}
+.rc-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#222,#1a1a1a);display:flex;align-items:center;justify-content:center;font-size:12px;border:1px solid rgba(255,255,255,0.08);}
+.rc-addr{font-size:11px;color:#555;letter-spacing:1px;font-family:monospace;}
+
+.empty-state{grid-column:1/-1;text-align:center;padding:60px 20px;}
+.empty-icon{font-size:52px;margin-bottom:14px;opacity:0.25;display:block;}
+.empty-text{font-size:13px;color:#555;letter-spacing:2px;text-transform:uppercase;}
+
+#backToTop{position:fixed;bottom:30px;right:30px;z-index:500;width:44px;height:44px;border-radius:50%;background:#fff;color:#000;font-size:18px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(255,255,255,0.2);opacity:0;visibility:hidden;pointer-events:none;transition:all 0.3s ease;}
+#backToTop.show{opacity:1;visibility:visible;pointer-events:auto;}
+#backToTop:hover{transform:translateY(-4px);box-shadow:0 0 30px rgba(255,255,255,0.4);}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="backdrop" id="backdrop"></div>
+<div class="backdrop-overlay"></div>
+<div class="page">
+
+<header>
+  <div class="logo" onclick="history.back()">
+    <img src="logo2.png" alt="BW" onerror="this.onerror=null;this.style.display='none'">
+    <span class="logo-text">BLACKWINE</span>
+  </div>
+  <div></div>
+  <div class="header-right">
+    <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left" style="font-size:11px"></i> Back</button>
+    <div class="user-chip">
+      <img class="user-avatar" id="headerAvatar" src="" alt="" onerror="this.onerror=null;this.style.display='none'">
+      <span id="userName">USER</span>
+    </div>
+  </div>
+</header>
+
+<div class="hero-area">
+  <div class="poster-col">
+    <div class="poster-border">
+      <div class="poster-frame">
+        <img id="poster" src="" alt="Poster" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x450/111/d4af37?text=NO+POSTER'">
+      </div>
+    </div>
+    <div class="wl-badge" id="wlBtn" onclick="toggleWatchlist()">☆</div>
+    <div class="poster-tags" id="posterTags"></div>
+  </div>
+
+  <div class="info-col">
+    <div class="breadcrumb">BLACKWINE &nbsp;<span>/</span>&nbsp; FILM RECORD</div>
+    <div class="film-title" id="filmTitle">—</div>
+    <div class="tagline" id="tagline"></div>
+    <div class="chain-badge"><div class="chain-dot"></div>LIVE ON BLOCKCHAIN</div>
+
+    <div class="stat-row">
+      <div class="stat-box"><span class="stat-num" id="avgRating">—</span><span class="stat-lbl">TMDB Score</span></div>
+      <div class="stat-box"><span class="stat-num" id="chainAvg">—</span><span class="stat-lbl">Chain Avg</span></div>
+      <div class="stat-box"><span class="stat-num white" id="reviewCount">0</span><span class="stat-lbl">Reviews</span></div>
+      <div class="stat-box"><span class="stat-num white" id="yearStat">—</span><span class="stat-lbl">Year</span></div>
+    </div>
+
+    <div class="rate-section">
+      <div class="rate-label">Your Rating</div>
+      <div class="stars-wrap" id="starsWrap">
+        <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span>
+        <span class="star" data-v="3">★</span><span class="star" data-v="4">★</span>
+        <span class="star" data-v="5">★</span><span class="star" data-v="6">★</span>
+        <span class="star" data-v="7">★</span><span class="star" data-v="8">★</span>
+        <span class="star" data-v="9">★</span><span class="star" data-v="10">★</span>
+      </div>
+      <div class="star-score-display" id="starDisplay">Click a star to rate</div>
+      <textarea class="review-textarea" id="comment" placeholder="Share your thoughts about this film…" maxlength="500" oninput="updateCharCount()"></textarea>
+      <div class="form-footer">
+        <span class="char-count" id="charCount">0 / 500</span>
+        <button class="submit-btn" id="submitBtn" onclick="submitReview()">
+          <i class="fas fa-link" style="font-size:11px"></i> Submit to Chain
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lower-section">
+  <div class="section-head">
+    <div class="section-head-title">CHAIN REVIEWS</div>
+    <div class="section-head-line"></div>
+    <div class="section-head-count" id="reviewBadge">0 REVIEWS</div>
+  </div>
+  <div class="reviews-grid" id="reviewsGrid">
+    <div class="empty-state"><span class="empty-icon">⛓</span><div class="empty-text">Connect MetaMask to load reviews</div></div>
+  </div>
+</div>
+</div>
+
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+const currentUser = localStorage.getItem("loggedInUser");
+if (currentUser) {
+    document.getElementById("userName").innerText = currentUser;
+    const av = localStorage.getItem("userAvatar_" + currentUser);
+    if (av) document.getElementById("headerAvatar").src = av;
+}
+
+let movie = null, selectedRating = 0;
+
+/* STARS — declared first so setStars() can reference it below */
+const stars = document.querySelectorAll(".star");
+
+try { movie = JSON.parse(localStorage.getItem("selectedMovie")); } catch(e){}
+
+if (!movie) {
+    document.getElementById("filmTitle").innerText = "No movie selected.";
+} else {
+    document.getElementById("backdrop").style.backgroundImage = `url('${movie.poster}')`;
+    document.getElementById("poster").src = movie.poster;
+
+    const words = movie.title.split(" ");
+    document.getElementById("filmTitle").innerHTML =
+        `<span class="gold">${words[0]}</span>${words.length > 1 ? " " + words.slice(1).join(" ") : ""}`;
+
+    document.getElementById("tagline").innerText =
+        [movie.type, movie.genre ? movie.genre.toUpperCase() : ""].filter(Boolean).join(" • ");
+
+    document.getElementById("avgRating").innerText = parseFloat(movie.score || 0).toFixed(1);
+    document.getElementById("yearStat").innerText  = movie.year || "—";
+
+    const tagsEl = document.getElementById("posterTags");
+    [movie.type, movie.genre, movie.year].filter(Boolean).forEach(t => {
+        const s = document.createElement("span");
+        s.className = "ptag"; s.innerText = t.toUpperCase(); tagsEl.appendChild(s);
+    });
+
+    syncWlBtn();
+
+    const user = localStorage.getItem("loggedInUser") || "guest";
+    const saved = JSON.parse(localStorage.getItem("userRatings_" + user)) || {};
+    if (saved[movie.title]) setStars(saved[movie.title]);
+}
+stars.forEach(star => {
+    star.addEventListener("mouseenter", () => highlightStars(+star.dataset.v));
+    star.addEventListener("mouseleave", () => highlightStars(selectedRating));
+    star.addEventListener("click",      () => { selectedRating = +star.dataset.v; setStars(selectedRating); });
+});
+function setStars(val) {
+    selectedRating = val;
+    highlightStars(val);
+    const labels = ["","Terrible","Bad","Poor","Below Average","Average","Decent","Good","Great","Excellent","Masterpiece"];
+    document.getElementById("starDisplay").innerHTML = `<span>${val}</span> / 10 &nbsp;—&nbsp; ${labels[val]||""}`;
+}
+function highlightStars(val) { stars.forEach(s => s.classList.toggle("active", +s.dataset.v <= val)); }
+
+function updateCharCount() {
+    document.getElementById("charCount").innerText = document.getElementById("comment").value.length + " / 500";
+}
+
+/* WATCHLIST */
+function syncWlBtn() {
+    if (!movie) return;
+    const wl = JSON.parse(localStorage.getItem("watchlist")) || [];
+    const btn = document.getElementById("wlBtn");
+    const isSaved = wl.includes(movie.title);
+    btn.innerText = isSaved ? "★" : "☆";
+    btn.classList.toggle("saved", isSaved);
+}
+function toggleWatchlist() {
+    let wl = JSON.parse(localStorage.getItem("watchlist")) || [];
+    if (wl.includes(movie.title)) {
+        wl = wl.filter(t => t !== movie.title);
+        showToast("Removed from watchlist", "info");
+    } else {
+        wl.push(movie.title);
+        const wlData = JSON.parse(localStorage.getItem("watchlistData")) || {};
+        wlData[movie.title] = movie;
+        localStorage.setItem("watchlistData", JSON.stringify(wlData));
+        showToast("Added to watchlist ★", "ok");
+    }
+    localStorage.setItem("watchlist", JSON.stringify(wl));
+    syncWlBtn();
+}
+
+/* BLOCKCHAIN */
+window.addEventListener("load", async () => {
+    const ready = await initBlockchain();
+    if (ready && movie) loadReviews();
+});
+
+async function submitReview() {
+    if (!movie) return;
+    if (selectedRating === 0) { showToast("Please select a star rating", "warn"); return; }
+    const review = document.getElementById("comment").value.trim();
+    if (!review) { showToast("Please write a review", "warn"); return; }
+
+    const btn = document.getElementById("submitBtn");
+    btn.classList.add("loading");
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:11px"></i> Submitting…';
+
+    const user = localStorage.getItem("loggedInUser") || "guest";
+    const ratings = JSON.parse(localStorage.getItem("userRatings_" + user)) || {};
+    ratings[movie.title] = selectedRating;
+    localStorage.setItem("userRatings_" + user, JSON.stringify(ratings));
+
+    const stats = JSON.parse(localStorage.getItem("movieStats")) || {};
+    if (!stats[movie.title]) stats[movie.title] = { total:0, votes:0 };
+    stats[movie.title].total += selectedRating;
+    stats[movie.title].votes++;
+    localStorage.setItem("movieStats", JSON.stringify(stats));
+
+    await addReviewToBlockchain(movie.title, review, selectedRating);
+    showToast("Review submitted to blockchain! ⛓", "ok");
+    document.getElementById("comment").value = "";
+    updateCharCount();
+    btn.classList.remove("loading");
+    btn.innerHTML = '<i class="fas fa-link" style="font-size:11px"></i> Submit to Chain';
+    loadReviews();
+}
+
+async function loadReviews() {
+    if (!contract || !movie) return;
+    const grid = document.getElementById("reviewsGrid");
+    grid.innerHTML = `<div class="empty-state"><span class="empty-icon">⛓</span><div class="empty-text">Loading from blockchain…</div></div>`;
+    try {
+        const data = await contract.methods.getReviews().call();
+        const filtered = data.filter(r => r.movieName && r.movieName.toLowerCase() === movie.title.toLowerCase());
+
+        document.getElementById("reviewCount").innerText = filtered.length;
+        document.getElementById("reviewBadge").innerText = filtered.length + " REVIEWS";
+
+        if (!filtered.length) {
+            grid.innerHTML = `<div class="empty-state"><span class="empty-icon">🎬</span><div class="empty-text">No reviews yet — be the first!</div></div>`;
+            document.getElementById("chainAvg").innerText = "—";
+            return;
+        }
+
+        let total = 0;
+        grid.innerHTML = filtered.map((r, i) => {
+            total += Number(r.rating);
+            const filled = Math.round(r.rating / 2);
+            const starStr = "★".repeat(filled) + "☆".repeat(5 - filled);
+            return `<div class="review-card" style="animation-delay:${i*0.06}s">
+                <div class="rc-top">
+                    <div class="rc-stars">${starStr}</div>
+                    <div class="rc-rating">${r.rating}<small>/10</small></div>
+                </div>
+                <div class="rc-text">${escHtml(r.reviewText)}</div>
+                <div class="rc-footer">
+                    <div class="rc-avatar">⛓</div>
+                    <div class="rc-addr">${r.reviewer.slice(0,6)}…${r.reviewer.slice(-4)}</div>
+                </div>
+            </div>`;
+        }).join("");
+
+        document.getElementById("chainAvg").innerText = (total / filtered.length).toFixed(1);
+    } catch(err) {
+        console.error(err);
+        grid.innerHTML = `<div class="empty-state"><span class="empty-icon">⚠</span><div class="empty-text">Could not load reviews</div></div>`;
+    }
+}
+
+function escHtml(s) {
+    if (typeof s !== "string") return "";
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+window.addEventListener("scroll", () => {
+    document.getElementById("backToTop").classList.toggle("show", window.scrollY > 300);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BLACKWINE | View All</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+body{
+    background:#000;
+    color:#fff;
+}
+
+/* HEADER */
+header{
+    padding:20px 60px;
+    border-bottom:1px solid #222;
+}
+
+header h2{
+    letter-spacing:3px;
+}
+
+/* MAIN */
+main{
+    padding:40px 60px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:24px;
+}
+
+/* CARD */
+.card{
+    background:#111;
+    border-radius:18px;
+    overflow:hidden;
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 0 20px rgba(255,255,255,0.15);
+}
+
+.card img{
+    width:100%;
+    height:260px;
+    object-fit:cover;
+}
+
+.card-content{
+    padding:12px;
+}
+
+.card-content h4{
+    font-size:15px;
+}
+
+.card-content p{
+    font-size:13px;
+    color:#aaa;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2 id="title">ALL</h2>
+</header>
+
+<main>
+    <div class="grid" id="grid"></div>
+</main>
+
+<script>
+/* ===== MASTER DATA (20+ EACH CATEGORY) ===== */
+const data = [
+
+/* ===== MOVIES (25) ===== */
+{title:"Interstellar",type:"Movie"},
+{title:"Inception",type:"Movie"},
+{title:"The Matrix",type:"Movie"},
+{title:"The Dark Knight",type:"Movie"},
+{title:"Fight Club",type:"Movie"},
+{title:"Forrest Gump",type:"Movie"},
+{title:"Gladiator",type:"Movie"},
+{title:"Joker",type:"Movie"},
+{title:"Parasite",type:"Movie"},
+{title:"Whiplash",type:"Movie"},
+{title:"Oppenheimer",type:"Movie"},
+{title:"Titanic",type:"Movie"},
+{title:"The Notebook",type:"Movie"},
+{title:"La La Land",type:"Movie"},
+{title:"Pride & Prejudice",type:"Movie"},
+{title:"Before Sunrise",type:"Movie"},
+{title:"The Conjuring",type:"Movie"},
+{title:"Hereditary",type:"Movie"},
+{title:"IT",type:"Movie"},
+{title:"The Exorcist",type:"Movie"},
+{title:"A Quiet Place",type:"Movie"},
+{title:"Insidious",type:"Movie"},
+{title:"Avatar",type:"Movie"},
+{title:"Blade Runner 2049",type:"Movie"},
+{title:"Arrival",type:"Movie"},
+
+/* ===== TV SHOWS (22) ===== */
+{title:"Breaking Bad",type:"TV"},
+{title:"Game of Thrones",type:"TV"},
+{title:"The Sopranos",type:"TV"},
+{title:"The Wire",type:"TV"},
+{title:"Peaky Blinders",type:"TV"},
+{title:"Better Call Saul",type:"TV"},
+{title:"Stranger Things",type:"TV"},
+{title:"Dark",type:"TV"},
+{title:"Money Heist",type:"TV"},
+{title:"The Boys",type:"TV"},
+{title:"Loki",type:"TV"},
+{title:"The Mandalorian",type:"TV"},
+{title:"House of the Dragon",type:"TV"},
+{title:"The Witcher",type:"TV"},
+{title:"Sherlock",type:"TV"},
+{title:"Narcos",type:"TV"},
+{title:"Chernobyl",type:"TV"},
+{title:"Ozark",type:"TV"},
+{title:"Westworld",type:"TV"},
+{title:"The Walking Dead",type:"TV"},
+{title:"Black Mirror",type:"TV"},
+{title:"Vikings",type:"TV"},
+
+/* ===== ANIME (22) ===== */
+{title:"Naruto",type:"Anime"},
+{title:"Naruto Shippuden",type:"Anime"},
+{title:"One Piece",type:"Anime"},
+{title:"Attack on Titan",type:"Anime"},
+{title:"Death Note",type:"Anime"},
+{title:"Demon Slayer",type:"Anime"},
+{title:"Jujutsu Kaisen",type:"Anime"},
+{title:"Tokyo Ghoul",type:"Anime"},
+{title:"Dragon Ball Z",type:"Anime"},
+{title:"Dragon Ball Super",type:"Anime"},
+{title:"Bleach",type:"Anime"},
+{title:"My Hero Academia",type:"Anime"},
+{title:"Fullmetal Alchemist",type:"Anime"},
+{title:"Hunter x Hunter",type:"Anime"},
+{title:"One Punch Man",type:"Anime"},
+{title:"Chainsaw Man",type:"Anime"},
+{title:"Spy x Family",type:"Anime"},
+{title:"Steins;Gate",type:"Anime"},
+{title:"Code Geass",type:"Anime"},
+{title:"Black Clover",type:"Anime"},
+{title:"Haikyuu",type:"Anime"},
+{title:"Attack on Titan: Final Season",type:"Anime"}
+];
+
+/* ===== READ URL PARAM ===== */
+const params = new URLSearchParams(window.location.search);
+const section = params.get("section");
+
+/* ===== TITLE ===== */
+const titleMap = {
+    movies:"TOP MOVIES",
+    tv:"TOP TV SHOWS",
+    anime:"ANIME",
+    trending:"TRENDING"
+};
+
+document.getElementById("title").innerText =
+    titleMap[section] || "ALL";
+
+/* ===== FILTER LOGIC ===== */
+const filtered = data.filter(item=>{
+    if(section==="movies") return item.type==="Movie";
+    if(section==="tv") return item.type==="TV";
+    if(section==="anime") return item.type==="Anime";
+    if(section==="trending") return true;
+    return true;
+});
+
+/* ===== RENDER ===== */
+document.getElementById("grid").innerHTML =
+filtered.map(item=>`
+    <div class="card">
+        <img src="https://via.placeholder.com/300x450?text=${encodeURIComponent(item.title)}">
+        <div class="card-content">
+            <h4>${item.title}</h4>
+            <p>${item.type}</p>
+        </div>
+    </div>
+`).join("");
+</script>
+
+</body>
+</html>

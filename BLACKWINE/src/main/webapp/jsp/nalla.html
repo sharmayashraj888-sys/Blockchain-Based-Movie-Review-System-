@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BLACKWINE | Profile</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:radial-gradient(circle at top,#2b2b2b 0%,#141414 45%,#000000 100%);
+    color:#fff;
+    padding:60px;
+    animation:fadeIn 0.6s ease;
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:50px;
+}
+
+.header h1{
+    letter-spacing:4px;
+}
+
+.header button{
+    padding:10px 25px;
+    border:none;
+    border-radius:30px;
+    background:#fff;
+    color:#000;
+    font-weight:700;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.header button:hover{
+    transform:scale(1.1);
+}
+
+/* PROFILE CARD */
+.profile-card{
+    display:flex;
+    gap:40px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(20px);
+    padding:40px;
+    border-radius:25px;
+    box-shadow:0 0 60px rgba(0,0,0,0.6);
+    
+}
+
+.avatar-wrapper{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:15px;
+}
+
+/* Container */
+.avatar-container{
+    position:relative;
+    width:150px;
+    height:150px;
+}
+
+/* Avatar */
+.avatar{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    padding:5px;
+    background:linear-gradient(135deg,#8b5cf6,#ff00ff);
+    animation:pulseGlow 2.5s infinite ease-in-out;
+    transition:0.4s;
+}
+
+.avatar img{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    object-fit:cover;
+    background:#111;
+    transition:0.4s;
+}
+
+/* Hover Zoom */
+.avatar-container:hover .avatar img{
+    transform:scale(1.08);
+}
+
+/* Camera Overlay */
+.camera-overlay{
+    position:absolute;
+    bottom:0;
+    right:0;
+    background:#8b5cf6;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    opacity:0;
+    transition:0.3s;
+    cursor:pointer;
+}
+
+.avatar-container:hover .camera-overlay{
+    opacity:1;
+}
+
+/* Upload Button */
+.upload-btn{
+    padding:8px 18px;
+    background:#8b5cf6;
+    border-radius:20px;
+    font-size:14px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.upload-btn:hover{
+    background:#a855f7;
+}
+
+/* Save Button Hidden Initially */
+.save-btn{
+    padding:8px 20px;
+    border:none;
+    border-radius:20px;
+    background:#ff00ff;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+    display:none;
+}
+
+.save-btn:hover{
+    opacity:0.8;
+}
+
+.profile-info h2{
+    font-size:30px;
+    letter-spacing:2px;
+}
+
+.profile-info p{
+    margin-top:10px;
+    color:#bbb;
+}
+
+/* STATS */
+.stats{
+    margin-top:50px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:25px;
+}
+
+.stat-box{
+    background:rgba(255,255,255,0.05);
+    padding:30px;
+    border-radius:20px;
+    text-align:center;
+    transition:0.3s;
+}
+
+.stat-box:hover{
+    transform:translateY(-10px);
+    box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+
+.stat-box h3{
+    font-size:28px;
+}
+
+.stat-box p{
+    margin-top:10px;
+    color:#bbb;
+}
+
+/* RATED MOVIES */
+.section-title{
+    margin-top:70px;
+    margin-bottom:25px;
+    font-size:22px;
+    letter-spacing:3px;
+}
+
+.rated-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:25px;
+}
+
+.movie-card{
+    background:#111;
+    padding:20px;
+    border-radius:18px;
+    transition:0.3s;
+}
+
+.movie-card:hover{
+    transform:translateY(-8px);
+}
+
+@keyframes fadeIn{
+    from{opacity:0;}
+    to{opacity:1;}
+}
+</style>
+</head>
+
+<body>
+
+<script>
+/* LOGIN PROTECTION */
+const user = localStorage.getItem("loggedInUser");
+if(!user){
+    window.location.href = "login.html";
+}
+</script>
+
+<div class="header">
+    <h1>PROFILE DASHBOARD</h1>
+    <button onclick="goHome()">Home</button>
+</div>
+
+<div class="avatar-wrapper">
+
+    <div class="avatar-container">
+        <div class="avatar">
+            <img id="profileAvatar" src="default-avatar.png">
+        </div>
+        <div class="camera-overlay">
+            📷
+        </div>
+    </div>
+
+    <label for="avatarInput" class="upload-btn">Change Avatar</label>
+    <input type="file" id="avatarInput" accept="image/*" hidden onchange="previewAvatar(event)">
+    
+    <button class="save-btn" id="saveBtn" onclick="saveAvatar()">Save Avatar</button>
+
+</div>
+    <div class="profile-info">
+        <h2 id="usernameDisplay"></h2>
+        <p>Member of BLACKWINE</p>
+    </div>
+</div>
+
+<div class="stats">
+    <div class="stat-box">
+        <h3 id="ratedCount">0</h3>
+        <p>Movies Rated</p>
+    </div>
+    <div class="stat-box">
+        <h3 id="avgScore">0</h3>
+        <p>Average Rating</p>
+    </div>
+</div>
+
+<div class="section-title">YOUR RATINGS</div>
+<div class="rated-list" id="ratedList"></div>
+
+<script>
+document.getElementById("usernameDisplay").innerText = user;
+const savedAvatar = localStorage.getItem("userAvatar_"+user);
+
+if(savedAvatar){
+    document.getElementById("profileAvatar").src = savedAvatar;
+}
+
+/* LOAD RATINGS */
+const ratings = JSON.parse(localStorage.getItem("userRatings")) || {};
+
+const ratedMovies = Object.keys(ratings);
+document.getElementById("ratedCount").innerText = ratedMovies.length;
+
+if(ratedMovies.length > 0){
+    const total = ratedMovies.reduce((sum,m)=>sum+ratings[m],0);
+    document.getElementById("avgScore").innerText = 
+        (total / ratedMovies.length).toFixed(1);
+
+    ratedMovies.forEach(movie=>{
+        document.getElementById("ratedList").innerHTML += `
+            <div class="movie-card">
+                <h4>${movie}</h4>
+                <p>⭐ ${ratings[movie]}/10</p>
+            </div>
+        `;
+    });
+}
+
+let tempAvatar = null;
+
+function previewAvatar(event){
+    const reader = new FileReader();
+    reader.onload = function(){
+        tempAvatar = reader.result;
+        document.getElementById("profileAvatar").src = tempAvatar;
+
+        // Show Save button
+        document.getElementById("saveBtn").style.display = "inline-block";
+    }
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+function saveAvatar(){
+    if(tempAvatar){
+        localStorage.setItem("userAvatar_"+user,tempAvatar);
+        alert("Avatar Saved Successfully!");
+        document.getElementById("saveBtn").style.display = "none";
+    }
+}
+
+function goHome(){
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
